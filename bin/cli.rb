@@ -20,22 +20,28 @@ class Cli
     @args = args
     throw_arg_error(:none) if @args.count.zero?
 
-    @input_docs = []
+    @input_text = []
     @args.each do |doc|
       throw_arg_error(:bad) if !File.file?(doc)
-      new_file = File.readlines(doc, chomp: true)
-      @input_docs.concat(new_file)
+
+      new_file = File.readlines(doc)
+      out = santize_text(new_file)
+
+      @input_text.concat(out)
     end
-    @input_docs = @input_docs.map(&:chomp).join(" ")
   end
 
   def main
-    @leftover_words = []
+    @input_text.each_with_index do |word, i|
+      current_word = word
+      one_ahead = @input_text[i + 1]
+      two_ahead = @input_text[i + 2]
 
-    @input_docs.each do |line|
-      split_line = line.split(' ')
-      process_text(split_line)
+      if one_ahead && two_ahead
+        update_store(current_word, one_ahead, two_ahead)
+      end
     end
+
     STORE
   end
 
@@ -46,9 +52,12 @@ class Cli
 
   private
 
-   def clean_string(str)
-    return nil unless str.is_a? String
+  def santize_text(new_file)
+    out = new_file.map { |text_file| clean_string(text_file).chomp } 
+    out.join(" ").split(" ")
+  end
 
+  def clean_string(str)
     str.downcase.gsub(/[^a-z0-9'\s]/i, '')
   end
 
@@ -61,32 +70,6 @@ class Cli
   def update_store(first_word, second_word, third_word)
     data_key = "#{first_word} #{second_word} #{third_word}"
     STORE.key?(data_key) ? STORE[data_key] += 1 : STORE[data_key] = 1
-  end
-
-  def process_text(split_line)
-    split_line.each_with_index do |word, i|
-      current_word = clean_string(word)
-      one_ahead = clean_string(split_line[i + 1])
-      two_ahead = clean_string(split_line[i + 2])
-      one_behind = clean_string(split_line[i -1])
-
-      if i === 0 && @leftover_words.any?
-        update_store(@leftover_words[0], @leftover_words[1], current_word)
-        print "first"
-        print @leftover_words
-        print [@leftover_words[0], @leftover_words[1], current_word]
-        @leftover_words.delete_at(0)
-      elsif i === 1 && @leftover_words.any?
-        update_store(@leftover_words[0], current_word, one_ahead)
-        print "second"
-        print @leftover_words
-        print [@leftover_words[0], one_behind, current_word]
-      elsif one_ahead && two_ahead
-        update_store(current_word, one_ahead, two_ahead)
-      else
-        @leftover_words.push(current_word) 
-      end
-    end
   end
 
   def throw_arg_error(type)
