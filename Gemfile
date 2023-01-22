@@ -9,3 +9,4 @@ gem 'rspec'
 gem 'rubocop', require: false
 gem 'rubocop-rake'
 gem 'rubocop-rspec'
+gem 'aruba'

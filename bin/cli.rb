@@ -1,13 +1,9 @@
 # frozen_string_literal: true
-
 # !/usr/bin/env ruby
-require 'hirb'
-require 'pry'
+require 'hirb' # for clean output display
+require 'pry' # for debugging
 
-# Main Cli class
 class Cli
-  STORE = {}
-
   def self.run(args)
     new(args).run
   end
@@ -17,66 +13,73 @@ class Cli
   end
 
   def initialize(args)
-    @args = args
-    throw_arg_error(:none) if @args.count.zero?
+    @store = {}
+    throw_arg_error(:none) if no_arg_given(args)
+    @formatted_args = args.is_a?(Array) ? read_files(args) : args.read
 
-    @input_text = []
-    @args.each do |doc|
-      throw_arg_error(:bad) if !File.file?(doc)
+    throw_arg_error(:none) if empty_arg_given
 
-      new_file = File.readlines(doc)
-      out = santize_text(new_file)
-
-      @input_text.concat(out)
-    end
+    @input_text = sanitize_input(@formatted_args)
   end
 
   def main
-    @input_text.each_with_index do |word, i|
-      current_word = word
+    @input_text.each_with_index do |current_word, i|
       one_ahead = @input_text[i + 1]
       two_ahead = @input_text[i + 2]
-
-      if one_ahead && two_ahead
-        update_store(current_word, one_ahead, two_ahead)
-      end
+      update_store(current_word, one_ahead, two_ahead) if one_ahead && two_ahead
     end
 
-    STORE
+    @store.sort { |a1, a2| a2[1].to_i <=> a1[1].to_i }.first(100)
   end
 
   def run
-    main
-    format_and_display_output
+    format_and_display_output(main)
+    0 # exit code
   end
 
   private
 
-  def santize_text(new_file)
-    out = new_file.map { |text_file| clean_string(text_file).chomp } 
-    out.join(" ").split(" ")
+  def sanitize_input(str)
+    out = str.downcase
+    out = out.gsub(/\\u[\da-f]{4}/i) { |m| [m[-4..-1].to_i(16)].pack('U') }
+    out = out.gsub(/[^a-z0-9'\s]/i, '').gsub(/\s+/, " ")
+    out.split(" ")
   end
 
-  def clean_string(str)
-    str.downcase.gsub(/[^a-z0-9'\s]/i, '')
-  end
-
-  def format_and_display_output
-    output = STORE.sort { |a1, a2| a2[1].to_i <=> a1[1].to_i }.first(100)
+  def format_and_display_output(output)
+    output = @store.sort { |a1, a2| a2[1].to_i <=> a1[1].to_i }.first(100)
 
     puts Hirb::Helpers::AutoTable.render(output, { headers: %w[phrase count] })
   end
 
+  def no_arg_given(args)
+    ARGV.empty? && STDIN.tty?
+  end
+
+  def empty_arg_given
+    @formatted_args.nil? || @formatted_args.empty?
+  end
+
   def update_store(first_word, second_word, third_word)
     data_key = "#{first_word} #{second_word} #{third_word}"
-    STORE.key?(data_key) ? STORE[data_key] += 1 : STORE[data_key] = 1
+    @store.key?(data_key) ? @store[data_key] += 1 : @store[data_key] = 1
   end
 
   def throw_arg_error(type)
     error_msgs = {
       none: 'Please include at least one text file as an argument.',
-      bad: 'Please include a valid file extension as an argument.',
+      bad: 'Please include a valid file extension as an argument.'
     }
     raise ArgumentError, error_msgs[type]
+  end
+
+  def read_files(files)
+    out = ""
+    files.each do |f|
+      throw_arg_error(:bad) if !File.file?(f)
+      formatted_file = File.read(f)
+      out += " #{formatted_file}"
+    end
+    out
   end
 end
