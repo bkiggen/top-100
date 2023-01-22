@@ -1,8 +1,10 @@
 # frozen_string_literal: true
+
 # !/usr/bin/env ruby
 require 'hirb' # for clean output display
 require 'pry' # for debugging
 
+# Cli
 class Cli
   def self.run(args)
     new(args).run
@@ -33,7 +35,8 @@ class Cli
   end
 
   def run
-    format_and_display_output(main)
+    main
+    format_and_display_output
     0 # exit code
   end
 
@@ -41,19 +44,19 @@ class Cli
 
   def sanitize_input(str)
     out = str.downcase
-    out = out.gsub(/\\u[\da-f]{4}/i) { |m| [m[-4..-1].to_i(16)].pack('U') }
-    out = out.gsub(/[^a-z0-9'\s]/i, '').gsub(/\s+/, " ")
-    out.split(" ")
+    out = out.gsub(/\\u[\da-f]{4}/i) { |m| [m[-4..].to_i(16)].pack('U') }
+    out = out.gsub(/[^a-z0-9'\s]/i, '').gsub(/\s+/, ' ')
+    out.split(' ')
   end
 
-  def format_and_display_output(output)
-    output = @store.sort { |a1, a2| a2[1].to_i <=> a1[1].to_i }.first(100)
+  def format_and_display_output
+    sorted_output = @store.sort { |a1, a2| a2[1].to_i <=> a1[1].to_i }.first(100)
 
-    puts Hirb::Helpers::AutoTable.render(output, { headers: %w[phrase count] })
+    puts Hirb::Helpers::AutoTable.render(sorted_output, { headers: %w[phrase count] })
   end
 
-  def no_arg_given(args)
-    ARGV.empty? && STDIN.tty?
+  def no_arg_given(_args)
+    ARGV.empty? && $stdin.tty?
   end
 
   def empty_arg_given
@@ -74,9 +77,9 @@ class Cli
   end
 
   def read_files(files)
-    out = ""
+    out = ''
     files.each do |f|
-      throw_arg_error(:bad) if !File.file?(f)
+      throw_arg_error(:bad) unless File.file?(f)
       formatted_file = File.read(f)
       out += " #{formatted_file}"
     end

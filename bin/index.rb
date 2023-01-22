@@ -1,5 +1,6 @@
 # frozen_string_literal: true
-#!/usr/bin/env ruby -n
+
+# !/usr/bin/env ruby -n
 
 require_relative 'cli'
 
