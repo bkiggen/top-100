@@ -29,6 +29,7 @@
     </li>
     <li><a href="#usage">Usage</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
+    <li><a href="#known-issues">Known Issues</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
   </ol>
@@ -95,6 +96,20 @@ Or to run the script with Standard Input, use:
   cat spec/test_texts/moby-dick.txt | rake run
 ```
 
+For the ease of experimenting, I've also added a couple of rake commands with .txt files included. Try:
+
+```sh
+  rake moby
+```
+
+```sh
+  rake brothers
+```
+
+```sh
+  rake both
+```
+
 ### Testing
 
 To run tests using RSPEC, enter the following command:
@@ -108,7 +123,7 @@ rake test
 ## Requirements
 
 - [x] The program accepts a list of one _or more_ file paths (e.g. `ruby solution.rb texts/moby-dick.txt brothers-karamazov.txt ...).`
-- [ ] The program _also_ accepts input via stdin (e.g. `cat texts/*.txt | java solution.java`).
+- [x] The program _also_ accepts input via stdin (e.g. `cat texts/*.txt | java solution.java`).
 - [x] The program outputs the first 100 most common three word sequences.
 - [x] The program ignores punctuation, line endings, and is case insensitive
 - [x] `“I love\nsandwiches.”` should be treated the same as `"(I LOVE SANDWICHES!!)"`).
@@ -120,7 +135,14 @@ rake test
 
 - Dockerize script
 - Improve handling of non-ASCII characters
-- Output to CSV
+- Could be cool to output to CSV
+- I'd like to learn more about stdin/stdout in CLIs and improve on its implementation here
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Known Issues
+
+- In order to satisfy the stdin requirement and ensure that type of input was tested, I had to add some branching logic to the cli class that I wasn't crazy about. Everything works but it feels hacky.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

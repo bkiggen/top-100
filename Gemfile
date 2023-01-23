@@ -2,7 +2,6 @@
 
 source 'https://rubygems.org'
 
-gem 'aruba'
 gem 'hirb'
 gem 'pry', '~> 0.13.1'
 gem 'rake'

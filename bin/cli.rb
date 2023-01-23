@@ -16,12 +16,12 @@ class Cli
 
   def initialize(args)
     @store = {}
-    throw_arg_error(:none) if no_arg_given(args)
-    @formatted_args = args.is_a?(Array) ? read_files(args) : args.read
+    throw_arg_error(:none) if no_arg_given
+    formatted_args = args.is_a?(Array) ? read_files(args) : args.read # branching for testing
 
-    throw_arg_error(:none) if empty_arg_given
+    throw_arg_error(:none) if empty_arg_given(formatted_args)
 
-    @input_text = sanitize_input(@formatted_args)
+    @input_text = sanitize_input(formatted_args)
   end
 
   def main
@@ -44,8 +44,8 @@ class Cli
 
   def sanitize_input(str)
     out = str.downcase
-    out = out.gsub(/\\u[\da-f]{4}/i) { |m| [m[-4..].to_i(16)].pack('U') }
-    out = out.gsub(/[^a-z0-9'\s]/i, '').gsub(/\s+/, ' ')
+    out = out.gsub(/\\u[\da-f]{4}/i) { |m| [m[-4..].to_i(16)].pack('U') } # remove unicode
+    out = out.gsub(/[^a-z0-9'\s]/i, '').gsub(/\s+/, ' ') # remove other unwanted characters
     out.split(' ')
   end
 
@@ -55,12 +55,12 @@ class Cli
     puts Hirb::Helpers::AutoTable.render(sorted_output, { headers: %w[phrase count] })
   end
 
-  def no_arg_given(_args)
+  def no_arg_given
     ARGV.empty? && $stdin.tty?
   end
 
-  def empty_arg_given
-    @formatted_args.nil? || @formatted_args.empty?
+  def empty_arg_given(args)
+    args.nil? || args.empty?
   end
 
   def update_store(first_word, second_word, third_word)
