@@ -159,6 +159,3 @@ Project Link: [https://github.com/bkiggen/top-100](https://github.com/bkiggen/to
 
 [ruby-url]: https://www.ruby-lang.org/en/
 
-```
-
-```
