@@ -55,8 +55,6 @@ Ruby 2.7.5
 
 ### Installation
 
-_Below is an example of how you can instruct your audience on installing and setting up your app. This template doesn't rely on any external dependencies or services._
-
 1. Clone the repo
    ```sh
    git clone https://github.com/bkiggen/top-100.git
@@ -96,7 +94,7 @@ Or to run the script with Standard Input, use:
   cat spec/test_texts/moby-dick.txt | rake run
 ```
 
-For the ease of experimenting, I've also added a couple of rake commands with .txt files included. Try:
+For the ease of experimenting, I've also added a few rake commands with .txt files included. Try:
 
 ```sh
   rake moby
