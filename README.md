@@ -39,7 +39,6 @@
 
 The purpose of this app is to receive a text file (or multiple text files) as user input and return a list of the top 100 most frequent three-word phrases, as well as their counts.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Built With
 
