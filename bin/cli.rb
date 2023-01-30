@@ -35,8 +35,7 @@ class Cli
   end
 
   def run
-    main
-    format_and_display_output
+    format_and_display_output(main)
     0 # exit code
   end
 
@@ -49,10 +48,8 @@ class Cli
     out.split(' ')
   end
 
-  def format_and_display_output
-    sorted_output = @store.sort { |a1, a2| a2[1].to_i <=> a1[1].to_i }.first(100)
-
-    puts Hirb::Helpers::AutoTable.render(sorted_output, { headers: %w[phrase count] })
+  def format_and_display_output(output)
+    puts Hirb::Helpers::AutoTable.render(output, { headers: %w[phrase count] })
   end
 
   def no_arg_given
